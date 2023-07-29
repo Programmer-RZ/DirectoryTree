@@ -3,27 +3,44 @@ import os
 class Tree:
     def __init__(self, dir):
         self.dir : str = dir
-        self.tree : list = os.walk(self.dir)
+        self.tree : list = []
+
+        if not os.path.isdir(self.dir):
+            raise NotADirectoryError(self.dir)
     
-    def print_tree(self):
-        print("\n")
+    def create_tree(self):
 
-        for folder, subfolders, files in self.tree:
+        for folder, subfolders, files in os.walk(self.dir):
             depth = self.get_directory_depth(folder) - self.get_directory_depth(self.dir)
+            depth -= 1
+
+            if folder == self.dir:
+                continue
             
-            print("|" + "----"*(depth) + folder)
+            # folder
+            self.tree.append("     "*(depth) + "|----" + folder)
+            self.addRootLines(depth)
 
-            print("|")
-
+            # files in folder
             for f in files:
                 try:
-                    print("|" + "----"*(depth+1) + f)
+                    #self.tree.append("     "*(depth+1) + "|")
+                    self.tree.append("     "*(depth+1) + "|----" + f)
                 except UnicodeEncodeError:
-                    print("???")
+                    self.tree.append("???")
 
-            print("|")
-
-        print("\n")
+    def print_tree(self):
+        for line in self.tree:
+            print(line)
     
     def get_directory_depth(self, path):
         return path.count(os.path.sep)
+
+    def addRootLines(self, depth):
+        # add | to every directory in self.tree at index depth*5
+        for i in range(len(self.tree)):
+            try:
+                if self.tree[i][depth*5] == " ":
+                    self.tree[i] = self.tree[i][:depth*5] + "|" + self.tree[i][depth*5+1:]
+            except IndexError:
+                continue
