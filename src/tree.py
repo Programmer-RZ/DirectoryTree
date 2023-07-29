@@ -18,14 +18,13 @@ class Tree:
                 continue
             
             # folder
-            self.tree.append("     "*(depth) + "|----" + folder)
+            self.tree.append("     "*(depth) + "├----" + folder)
             self.addRootLines(depth)
 
             # files in folder
             for f in files:
                 try:
-                    #self.tree.append("     "*(depth+1) + "|")
-                    self.tree.append("     "*(depth+1) + "|----" + f)
+                    self.tree.append("     "*(depth+1) + "├----" + f)
                 except UnicodeEncodeError:
                     self.tree.append("???")
 
@@ -41,6 +40,6 @@ class Tree:
         for i in range(len(self.tree)):
             try:
                 if self.tree[i][depth*5] == " ":
-                    self.tree[i] = self.tree[i][:depth*5] + "|" + self.tree[i][depth*5+1:]
+                    self.tree[i] = self.tree[i][:depth*5] + "│" + self.tree[i][depth*5+1:]
             except IndexError:
                 continue
