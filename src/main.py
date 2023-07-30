@@ -1,8 +1,9 @@
 
 from tree import Tree
+from gui import GUI
 
 if __name__ == "__main__":
-    tree = Tree(input("Directory: "))
-    tree.create_walk()
-    tree.create_tree()
-    tree.print_tree()
+    tree = Tree()
+
+    gui = GUI(tree)
+    gui.mainloop()

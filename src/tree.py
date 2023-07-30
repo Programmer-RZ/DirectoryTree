@@ -1,9 +1,9 @@
 import os
 
 class Tree:
-    def __init__(self, dir : str) -> None:
+    def __init__(self) -> None:
 
-        self.dir : str = dir
+        self.dir : str = "."
 
         # parameters
         self.include_folders = True
@@ -17,6 +17,10 @@ class Tree:
 
         if not os.path.isdir(self.dir):
             raise NotADirectoryError(self.dir)
+    
+    def reset(self):
+        self.walk = None
+        self.tree = []
     
     def create_walk(self) -> None:
         self.walk = os.walk(self.dir)
