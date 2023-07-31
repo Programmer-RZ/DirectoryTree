@@ -3,21 +3,22 @@ from tkinter import filedialog as fd
 
 from tree import Tree
 
-class GUI(Tk):
+class Window(Tk):
     def __init__(self, tree : Tree):
         super().__init__()
 
-        self.grid_rowconfigure(0, weight=1)
+        self.grid_rowconfigure(1, weight=1)
         self.grid_columnconfigure(0, weight=1)
 
-        self.title("Directory Tree")
         self.geometry("1000x600")
 
         self.tree_frame = TreeFrame(self, tree)
-        self.tree_frame.grid(row=0, column=0, padx=10, pady=10, sticky="EWNS")
+        self.tree_frame.grid(row=1, column=0, sticky="EWNS")
 
-        self.sidepanel = Sidepanel(self, self.tree_frame)
-        self.sidepanel.grid(row=0, column=1, padx=10, pady=10, sticky="EWNS")
+        self.gui = GUI(self, self.tree_frame)
+        self.gui.grid(row=0, column=0, sticky="EWNS")
+
+        self.title(f"Directory Tree - {self.tree_frame.tree.dir}")
 
 
 class TreeFrame(Frame):
@@ -44,24 +45,63 @@ class TreeFrame(Frame):
         self.text.config(state=DISABLED)
 
 
-class Sidepanel(Frame):
+class GUI(Frame):
     def __init__(self, master : Misc, treeframe : TreeFrame):
         super().__init__(master, bg="darkgrey")
 
         self.treeframe : TreeFrame = treeframe
 
-        self.pick_directory : Button = Button(self, text="Choose directory", command=lambda : self.choose_directory())
-        self.pick_directory.grid(row=0, column=0, padx=10, pady=10)
+        self.create_tree : Button = Button(self, text="Create directory tree", command=lambda : self.create_popup_window())
+        self.create_tree.grid(row=0, column=0, padx=10, pady=10)
 
-        self.create_tree : Button = Button(self, text="Create directory tree", command=lambda : self.create_directory_tree())
-        self.create_tree.grid(row=1, column=0, padx=10, pady=10)
+
+        self.popup : Toplevel = None
+        
     
-    def create_directory_tree(self):
+    def create_tree_directory(self):
         self.treeframe.tree.reset()
         self.treeframe.tree.create_walk()
         self.treeframe.tree.create_tree()
         self.treeframe.update_text()
     
-    def choose_directory(self):
-        self.treeframe.tree.dir = fd.askdirectory()
+    def create_popup_window(self):
+        if self.popup and self.popup.winfo_exists():
+            return
+        
+        self.popup = Toplevel(self.master)
+        self.popup.title("Create Directory Tree")
+        self.popup.grab_set()
+
+        # directory
+        current_directory : Label = Label(self.popup, text=self.treeframe.tree.dir, borderwidth=2, relief="ridge")
+        current_directory.grid(row=0, column=0, padx=10, pady=10)
+
+        pick_directory : Button = Button(self.popup, text="Browse", command=lambda : choose_directory())
+        pick_directory.grid(row=0, column=1, padx=10, pady=10)
+
+        # confirm
+        confirm : Button = Button(self.popup, text="Confirm", command=lambda : confirm())
+        confirm.grid(row=1, column=1, padx=5, pady=10)
+
+        # cancel
+        cancel : Button = Button(self.popup, text="Cancel", command=lambda : cancel())
+        cancel.grid(row=1, column=3, padx=5, pady=10)
+
+        def choose_directory():
+            dir : str = fd.askdirectory()
+            if dir:
+                self.treeframe.tree.dir = dir
+                current_directory.config(text=dir)
+                self.winfo_toplevel().title(f"Directory Tree - {dir}")
+        
+        def confirm():
+            self.create_tree_directory()
+            
+            self.popup.destroy()
+            self.popup = None
+        
+        def cancel():
+            self.popup.destroy()
+            self.popup = None
+
         

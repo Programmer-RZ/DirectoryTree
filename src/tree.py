@@ -3,7 +3,7 @@ import os
 class Tree:
     def __init__(self) -> None:
 
-        self.dir : str = "."
+        self.dir : str = os.getcwd()
 
         # parameters
         self.include_folders = True

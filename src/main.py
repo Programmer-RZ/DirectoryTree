@@ -1,9 +1,9 @@
 
 from tree import Tree
-from gui import GUI
+from gui import Window
 
 if __name__ == "__main__":
     tree = Tree()
 
-    gui = GUI(tree)
-    gui.mainloop()
+    window = Window(tree)
+    window.mainloop()
