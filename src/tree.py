@@ -11,6 +11,7 @@ class Tree:
         self.include_abspath = False
 
         self.tree : list = []
+        self.depths : list = []
         self.walk : iter = None
 
         self.divider : str = "     "
@@ -35,6 +36,7 @@ class Tree:
             if self.include_folders:
                 if folder != self.dir:
                     self.tree.append(self.divider*(depth) + "├----" + folder)
+                    self.depths.append(depth)
                     self.addRootLines(depth)
 
             # files in folder
@@ -42,6 +44,7 @@ class Tree:
                 for f in files:
                     try:
                         self.tree.append(self.divider*(depth+1) + "├----" + f)
+                        self.depths.append(depth+1)
                     except UnicodeEncodeError:
                         self.tree.append("???")
 
@@ -54,9 +57,11 @@ class Tree:
 
     def addRootLines(self, depth : int) -> None:
         # add | to every directory in self.tree at index depth*5
-        for i in range(len(self.tree)):
+        for i in range(len(self.tree)-2, 0, -1):
             try:
-                if self.tree[i][depth*len(self.divider)] == " ":
+                if self.tree[i][depth*len(self.divider)] == " " and self.depths[i] >= depth:
                     self.tree[i] = self.tree[i][:depth*len(self.divider)] + "│" + self.tree[i][depth*len(self.divider)+1:]
+                else:
+                    break
             except IndexError:
                 continue
