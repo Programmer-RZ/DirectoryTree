@@ -73,19 +73,24 @@ class GUI(Frame):
         self.popup.grab_set()
 
         # directory
-        current_directory : Label = Label(self.popup, text=self.treeframe.tree.dir, borderwidth=2, relief="ridge")
+        current_directory : Label = Label(self.popup, width=40, text=self.treeframe.tree.dir, borderwidth=2, relief="ridge")
         current_directory.grid(row=0, column=0, padx=10, pady=10)
 
         pick_directory : Button = Button(self.popup, text="Browse", command=lambda : choose_directory())
         pick_directory.grid(row=0, column=1, padx=10, pady=10)
 
+        # parameters
+        folders_string_var : StringVar = StringVar(value="on")
+        folders : Checkbutton = Checkbutton(self.popup, text="Include folders", variable=folders_string_var, onvalue="on", offvalue="off")
+        folders.grid(row=1, column=0)
+
+        files_string_var : StringVar = StringVar(value="on")
+        files : Checkbutton = Checkbutton(self.popup, text="Include files", variable=files_string_var, onvalue="on", offvalue="off")
+        files.grid(row=2, column=0, pady=10)
+
         # confirm
         confirm : Button = Button(self.popup, text="Confirm", command=lambda : confirm())
-        confirm.grid(row=1, column=1, padx=5, pady=10)
-
-        # cancel
-        cancel : Button = Button(self.popup, text="Cancel", command=lambda : cancel())
-        cancel.grid(row=1, column=3, padx=5, pady=10)
+        confirm.grid(row=3, column=2, padx=5, pady=10, sticky="ES")
 
         def choose_directory():
             dir : str = fd.askdirectory()
@@ -95,12 +100,18 @@ class GUI(Frame):
                 self.winfo_toplevel().title(f"Directory Tree - {dir}")
         
         def confirm():
+            if folders_string_var.get() == "on":
+                self.treeframe.tree.include_folders = True
+            else:
+                self.treeframe.tree.include_folders = False
+            
+            if files_string_var.get() == "on":
+                self.treeframe.tree.include_files = True
+            else:
+                self.treeframe.tree.include_files = False
+
             self.create_tree_directory()
             
-            self.popup.destroy()
-            self.popup = None
-        
-        def cancel():
             self.popup.destroy()
             self.popup = None
 

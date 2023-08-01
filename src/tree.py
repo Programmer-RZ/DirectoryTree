@@ -47,6 +47,8 @@ class Tree:
                         self.depths.append(depth+1)
                     except UnicodeEncodeError:
                         self.tree.append("???")
+                
+                self.addRootLines(depth+1)
 
     def print_tree(self) -> None:
         for line in self.tree:
