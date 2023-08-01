@@ -88,9 +88,13 @@ class GUI(Frame):
         files : Checkbutton = Checkbutton(self.popup, text="Include files", variable=files_string_var, onvalue="on", offvalue="off")
         files.grid(row=2, column=0, pady=10)
 
+        abspath_string_var : StringVar = StringVar(value="off")
+        abspath : Checkbutton = Checkbutton(self.popup, text="Include absolute path", variable=abspath_string_var, onvalue="on", offvalue="off")
+        abspath.grid(row=3, column=0)
+
         # confirm
         confirm : Button = Button(self.popup, text="Confirm", command=lambda : confirm())
-        confirm.grid(row=3, column=2, padx=5, pady=10, sticky="ES")
+        confirm.grid(row=4, column=2, padx=5, pady=10, sticky="ES")
 
         def choose_directory():
             dir : str = fd.askdirectory()
@@ -109,6 +113,11 @@ class GUI(Frame):
                 self.treeframe.tree.include_files = True
             else:
                 self.treeframe.tree.include_files = False
+            
+            if abspath_string_var.get() == "on":
+                self.treeframe.tree.include_abspath = True
+            else:
+                self.treeframe.tree.include_abspath = False
 
             self.create_tree_directory()
             

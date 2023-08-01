@@ -27,6 +27,7 @@ class Tree:
         self.walk = os.walk(self.dir)
     
     def create_tree(self) -> None:
+        root_path = os.path.abspath(self.dir)
 
         for folder, subfolders, files in self.walk:
             depth : int = self.get_directory_depth(folder) - self.get_directory_depth(self.dir)
@@ -34,8 +35,13 @@ class Tree:
             
             # folder
             if self.include_folders:
-                if folder != self.dir:
-                    self.tree.append(self.divider*(depth) + "├----" + folder)
+                path = os.path.abspath(folder)
+
+                if path != root_path:
+                    if not self.include_abspath:
+                        path = self.getDifference(path, root_path)
+
+                    self.tree.append(self.divider*(depth) + "├----" + path)
                     self.depths.append(depth)
                     self.addRootLines(depth)
 
@@ -43,7 +49,12 @@ class Tree:
             if self.include_files:
                 for f in files:
                     try:
-                        self.tree.append(self.divider*(depth+1) + "├----" + f)
+                        path = os.path.abspath(f)
+
+                        if not self.include_abspath:
+                            path = self.getDifference(path, root_path)
+
+                        self.tree.append(self.divider*(depth+1) + "├----" + path)
                         self.depths.append(depth+1)
                     except UnicodeEncodeError:
                         self.tree.append("???")
@@ -67,3 +78,17 @@ class Tree:
                     break
             except IndexError:
                 continue
+    
+    def getDifference(self, full_path, reference_path):
+        # gets the remaining path of full_path - reference_path
+        full_path = os.path.normpath(full_path)
+        reference_path = os.path.normpath(reference_path)
+
+        # Check if the reference_path is a prefix of the full_path
+        if not full_path.startswith(reference_path):
+            raise ValueError("The reference_path is not a prefix of the full_path")
+
+        # Extract the remaining part of the full_path
+        remaining_path = full_path[len(reference_path):].strip(os.path.sep)
+
+        return remaining_path
