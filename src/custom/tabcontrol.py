@@ -2,8 +2,11 @@ from tkinter import *
 from tkinter import ttk
 
 # Custom TKinter notebook for tab control
+# From https://stackoverflow.com/questions/39458337/is-there-a-way-to-add-close-buttons-to-tabs-in-tkinter-ttk-notebook
+# Slightly edited by me
+
 class CustomNotebook(ttk.Notebook):
-    """A ttk Notebook with close buttons on each tab"""
+    # A ttk Notebook with close buttons on each tab
 
     __initialized = False
 

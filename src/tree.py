@@ -19,7 +19,13 @@ class Tree:
         if not os.path.isdir(self.dir):
             raise NotADirectoryError(self.dir)
     
-    def reset(self):
+    def save_as(self, path : str):
+        with open(path, "w") as file:
+            for line in self.tree:
+                file.write(line + "\n")
+
+    
+    def reset(self) -> None:
         self.walk = None
         self.tree = []
     
@@ -40,7 +46,7 @@ class Tree:
                     if not self.include_abspath:
                         path = self.get_basename(path)
 
-                    self.tree.append(self.divider*(depth) + "├----" + path)
+                    self.tree.append(self.divider*(depth) + "|----" + path)
                     self.depths.append(depth)
                     self.add_root_lines(depth)
 
@@ -53,7 +59,7 @@ class Tree:
                         if not self.include_abspath:
                             path = self.get_basename(path)
 
-                        self.tree.append(self.divider*(depth+1) + "├----" + path)
+                        self.tree.append(self.divider*(depth+1) + "|----" + path)
                         self.depths.append(depth+1)
                     except UnicodeEncodeError:
                         self.tree.append("???")
@@ -70,12 +76,12 @@ class Tree:
         for i in range(len(self.tree)-2, 0, -1):
             try:
                 if self.tree[i][depth*len(self.divider)] == " " and self.depths[i] >= depth:
-                    self.tree[i] = self.tree[i][:depth*len(self.divider)] + "│" + self.tree[i][depth*len(self.divider)+1:]
+                    self.tree[i] = self.tree[i][:depth*len(self.divider)] + "|" + self.tree[i][depth*len(self.divider)+1:]
                 else:
                     break
             except IndexError:
                 continue
     
-    def get_basename(self, path) -> str:
+    def get_basename(self, path : str) -> str:
         # gets the last part of path
         return os.path.basename(path)

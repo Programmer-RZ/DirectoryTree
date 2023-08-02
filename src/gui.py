@@ -1,5 +1,4 @@
 from tkinter import *
-from tkinter import ttk
 from tkinter import filedialog as fd
 
 from tree import Tree
@@ -16,6 +15,7 @@ class Window(Tk):
         self.state('zoomed')
 
         self.tab_control : CustomNotebook = CustomNotebook(self)
+
         self.menubar : Menubar = Menubar(self, self.tab_control)
 
         self.tab_control.grid(row=0, column=0, padx=5, pady=5, sticky="EWNS")
@@ -137,12 +137,22 @@ class Menubar(Menu):
 
         self.tabcontrol : CustomNotebook = tabcontrol
 
-        self.filemenu : Menu = Menu(self, tearoff=0)
-        self.filemenu.add_command(label="New", command=lambda : self.new_gui())
+        filemenu : Menu = Menu(self, tearoff=0)
+        filemenu.add_command(label="New", command=lambda : self.new_gui())
+        filemenu.add_separator()
+        filemenu.add_command(label="Save as", command=lambda : self.save_as())
 
-        self.add_cascade(label="File", menu=self.filemenu)
+        self.add_cascade(label="File", menu=filemenu)
     
     def new_gui(self) -> None:
-        self.tabcontrol.add(GUI(self.master), text=f"New {len(self.tabcontrol.tabs())+1}")
+        new = GUI(self.master)
+        self.tabcontrol.add(new, text=f"New {len(self.tabcontrol.tabs())+1}")
+    
+    def save_as(self) -> None:
+        filetypes = (("Text files", "*.txt"),)
+        path = fd.asksaveasfilename(defaultextension="*.*", filetypes=filetypes)
+
+        selected_tab : GUI = self.tabcontrol.nametowidget(self.tabcontrol.select())
+        selected_tab.treeframe.tree.save_as(path)
 
         
