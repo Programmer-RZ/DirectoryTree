@@ -76,6 +76,6 @@ class Tree:
             except IndexError:
                 continue
     
-    def get_basename(self, path):
+    def get_basename(self, path) -> str:
         # gets the last part of path
         return os.path.basename(path)

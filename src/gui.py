@@ -1,41 +1,43 @@
 from tkinter import *
+from tkinter import ttk
 from tkinter import filedialog as fd
 
 from tree import Tree
+from custom.tabcontrol import CustomNotebook
 
 class Window(Tk):
-    def __init__(self, tree : Tree):
+    def __init__(self) -> None:
         super().__init__()
 
-        self.grid_rowconfigure(1, weight=1)
+        self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
 
         self.geometry("1000x600")
 
-        self.tree_frame = TreeFrame(self, tree)
-        self.tree_frame.grid(row=1, column=0, sticky="EWNS")
+        self.tab_control : CustomNotebook = CustomNotebook(self)
+        self.menubar : Menubar = Menubar(self, self.tab_control)
 
-        self.gui = GUI(self, self.tree_frame)
-        self.gui.grid(row=0, column=0, sticky="EWNS")
+        self.tab_control.grid(row=0, column=0, padx=5, pady=5, sticky="EWNS")
 
-        self.title(f"Directory Tree - {self.tree_frame.tree.dir}")
+        self.title(f"Directory Tree")
+        self.config(menu=self.menubar)
 
 
 class TreeFrame(Frame):
-    def __init__(self, master : Misc, tree : Tree):
+    def __init__(self, master : Misc) -> None:
         super().__init__(master, bg="darkgrey")
 
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
 
-        self.tree : Tree = tree
+        self.tree : Tree = Tree()
 
         self.text : Text = Text(self)
         self.update_text()
         
         self.text.grid(row=0, column=0, padx=10, pady=10, sticky="EWNS")
     
-    def update_text(self):
+    def update_text(self) -> None:
         self.text.config(state=NORMAL)
 
         self.text.delete(1.0, END)
@@ -46,25 +48,28 @@ class TreeFrame(Frame):
 
 
 class GUI(Frame):
-    def __init__(self, master : Misc, treeframe : TreeFrame):
+    def __init__(self, master : Misc) -> None:
         super().__init__(master, bg="darkgrey")
+        
+        self.grid_rowconfigure(1, weight=1)
+        self.grid_columnconfigure(0, weight=1)
 
-        self.treeframe : TreeFrame = treeframe
+        self.treeframe : TreeFrame = TreeFrame(self)
+        self.treeframe.grid(row=1, column=0, sticky="EWNS")
 
         self.create_tree : Button = Button(self, text="Create directory tree", command=lambda : self.create_popup_window())
-        self.create_tree.grid(row=0, column=0, padx=10, pady=10)
-
+        self.create_tree.grid(row=0, column=0, sticky="W", padx=10)
 
         self.popup : Toplevel = None
         
     
-    def create_tree_directory(self):
+    def create_tree_directory(self) -> None:
         self.treeframe.tree.reset()
         self.treeframe.tree.create_walk()
         self.treeframe.tree.create_tree()
         self.treeframe.update_text()
     
-    def create_popup_window(self):
+    def create_popup_window(self) -> None:
         if self.popup and self.popup.winfo_exists():
             return
         
@@ -96,14 +101,14 @@ class GUI(Frame):
         confirm : Button = Button(self.popup, text="Confirm", command=lambda : confirm())
         confirm.grid(row=4, column=2, padx=5, pady=10, sticky="ES")
 
-        def choose_directory():
+        def choose_directory() -> None:
             dir : str = fd.askdirectory()
             if dir:
                 self.treeframe.tree.dir = dir
                 current_directory.config(text=dir)
                 self.winfo_toplevel().title(f"Directory Tree - {dir}")
         
-        def confirm():
+        def confirm() -> None:
             if folders_string_var.get() == "on":
                 self.treeframe.tree.include_folders = True
             else:
@@ -123,5 +128,20 @@ class GUI(Frame):
             
             self.popup.destroy()
             self.popup = None
+
+
+class Menubar(Menu):
+    def __init__(self, master : Misc, tabcontrol : CustomNotebook):
+        super().__init__(master)
+
+        self.tabcontrol : CustomNotebook = tabcontrol
+
+        self.filemenu : Menu = Menu(self)
+        self.filemenu.add_command(label="New", command=lambda : self.new_gui())
+
+        self.add_cascade(label="File", menu=self.filemenu)
+    
+    def new_gui(self) -> None:
+        self.tabcontrol.add(GUI(self.master), text="New")
 
         
