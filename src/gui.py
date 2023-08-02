@@ -12,13 +12,14 @@ class Window(Tk):
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
 
-        self.geometry("1000x600")
+        #self.geometry("1000x600")
+        self.state('zoomed')
 
         self.tab_control : CustomNotebook = CustomNotebook(self)
         self.menubar : Menubar = Menubar(self, self.tab_control)
 
         self.tab_control.grid(row=0, column=0, padx=5, pady=5, sticky="EWNS")
-
+        
         self.title(f"Directory Tree")
         self.config(menu=self.menubar)
 
@@ -136,12 +137,12 @@ class Menubar(Menu):
 
         self.tabcontrol : CustomNotebook = tabcontrol
 
-        self.filemenu : Menu = Menu(self)
+        self.filemenu : Menu = Menu(self, tearoff=0)
         self.filemenu.add_command(label="New", command=lambda : self.new_gui())
 
         self.add_cascade(label="File", menu=self.filemenu)
     
     def new_gui(self) -> None:
-        self.tabcontrol.add(GUI(self.master), text="New")
+        self.tabcontrol.add(GUI(self.master), text=f"New {len(self.tabcontrol.tabs())+1}")
 
         
