@@ -23,6 +23,11 @@ class Tree:
         with open(path, "w") as file:
             for line in self.tree:
                 file.write(line + "\n")
+    
+    def open(self, path : str):
+        with open(path, "r") as file:
+            for line in file.readlines():
+                self.tree.append("".join(line.split("\n")))
 
     
     def reset(self) -> None:

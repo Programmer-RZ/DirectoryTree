@@ -1,6 +1,10 @@
 from tkinter import *
 from tkinter import filedialog as fd
 
+# fix blurred text
+from ctypes import windll
+windll.shcore.SetProcessDpiAwareness(1)
+
 from tree import Tree
 from custom.tabcontrol import CustomNotebook
 
@@ -59,7 +63,7 @@ class GUI(Frame):
         self.treeframe.grid(row=1, column=0, sticky="EWNS")
 
         self.create_tree : Button = Button(self, text="Create directory tree", command=lambda : self.create_popup_window())
-        self.create_tree.grid(row=0, column=0, sticky="W", padx=10)
+        self.create_tree.grid(row=0, column=0, sticky="W", padx=10, pady=5)
 
         self.popup : Toplevel = None
         
@@ -141,11 +145,24 @@ class Menubar(Menu):
         filemenu.add_command(label="New", command=lambda : self.new_gui())
         filemenu.add_separator()
         filemenu.add_command(label="Save as", command=lambda : self.save_as())
+        filemenu.add_separator()
+        filemenu.add_command(label="Open", command=lambda : self.open())
 
         self.add_cascade(label="File", menu=filemenu)
     
     def new_gui(self) -> None:
         new = GUI(self.master)
+        self.tabcontrol.add(new, text=f"New {len(self.tabcontrol.tabs())+1}")
+        self.tabcontrol.select(self.tabcontrol.index("end")-1)
+    
+    def open(self) -> None:
+        filetypes = (("Text files", "*.txt"),)
+        path = fd.askopenfilename(filetypes=filetypes)
+
+        new = GUI(self.master)
+        new.treeframe.tree.open(path)
+        new.treeframe.update_text()
+        
         self.tabcontrol.add(new, text=f"New {len(self.tabcontrol.tabs())+1}")
     
     def save_as(self) -> None:
