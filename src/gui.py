@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import filedialog as fd
+import os
 
 # fix blurred text
 from ctypes import windll
@@ -52,12 +53,14 @@ class TreeFrame(Frame):
         self.text.config(state=DISABLED)
 
 
-class GUI(Frame):
-    def __init__(self, master : Misc) -> None:
+class Tab(Frame):
+    def __init__(self, master : Misc, name : str = "New") -> None:
         super().__init__(master, bg="darkgrey")
         
         self.grid_rowconfigure(1, weight=1)
         self.grid_columnconfigure(0, weight=1)
+
+        self.name : str = name
 
         self.treeframe : TreeFrame = TreeFrame(self)
         self.treeframe.grid(row=1, column=0, sticky="EWNS")
@@ -142,34 +145,53 @@ class Menubar(Menu):
         self.tabcontrol : CustomNotebook = tabcontrol
 
         filemenu : Menu = Menu(self, tearoff=0)
-        filemenu.add_command(label="New", command=lambda : self.new_gui())
+
+        filemenu.add_command(label="New", command=lambda : self.new_tab())
+
         filemenu.add_separator()
+
         filemenu.add_command(label="Save as", command=lambda : self.save_as())
+        filemenu.add_command(label="Save", command=lambda : self.save())
+
         filemenu.add_separator()
+
         filemenu.add_command(label="Open", command=lambda : self.open())
 
         self.add_cascade(label="File", menu=filemenu)
     
-    def new_gui(self) -> None:
-        new = GUI(self.master)
-        self.tabcontrol.add(new, text=f"New {len(self.tabcontrol.tabs())+1}")
+    def new_tab(self) -> None:
+        new = Tab(self.master)
+        self.tabcontrol.add(new, text=new.name)
         self.tabcontrol.select(self.tabcontrol.index("end")-1)
     
     def open(self) -> None:
         filetypes = (("Text files", "*.txt"),)
-        path = fd.askopenfilename(filetypes=filetypes)
+        file = fd.askopenfilename(filetypes=filetypes)
 
-        new = GUI(self.master)
-        new.treeframe.tree.open(path)
+        if not file:
+            return
+
+        new = Tab(self.master, os.path.splitext(os.path.basename(file))[0])
+        new.treeframe.tree.open(file)
         new.treeframe.update_text()
         
-        self.tabcontrol.add(new, text=f"New {len(self.tabcontrol.tabs())+1}")
+        self.tabcontrol.add(new, text=new.name)
     
     def save_as(self) -> None:
         filetypes = (("Text files", "*.txt"),)
         path = fd.asksaveasfilename(defaultextension="*.*", filetypes=filetypes)
 
-        selected_tab : GUI = self.tabcontrol.nametowidget(self.tabcontrol.select())
-        selected_tab.treeframe.tree.save_as(path)
+        selected_tab : Tab = self.tabcontrol.nametowidget(self.tabcontrol.select())
+        selected_tab.name = os.path.splitext(os.path.basename(path))[0]
+        selected_tab.treeframe.tree.save(path)
+
+        self.tabcontrol.tab(selected_tab, text=selected_tab.name)
+    
+    def save(self) -> None:
+        selected_tab : Tab = self.tabcontrol.nametowidget(self.tabcontrol.select())
+        if not selected_tab.treeframe.tree.path:
+            self.save_as()
+        
+        selected_tab.treeframe.tree.save()
 
         
