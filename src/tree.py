@@ -14,13 +14,18 @@ class Tree:
         self.depths : list = []
         self.walk : iter = None
 
+        self.path : str = None
+
         self.divider : str = "     "
 
         if not os.path.isdir(self.dir):
             raise NotADirectoryError(self.dir)
     
-    def save_as(self, path : str):
-        with open(path, "w") as file:
+    def save(self, newpath : str = None):
+        if newpath:
+            self.path = newpath
+            
+        with open(self.path, "w") as file:
             for line in self.tree:
                 file.write(line + "\n")
     
