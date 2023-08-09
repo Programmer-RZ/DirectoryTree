@@ -2,7 +2,8 @@ import os
 
 class Tree:
     def __init__(self) -> None:
-
+        
+        # path of root directory
         self.dir : str = os.getcwd()
 
         # parameters
@@ -14,6 +15,8 @@ class Tree:
         self.depths : list = []
         self.walk : iter = None
 
+        # path of the file
+        # when directory tree is saved
         self.path : str = None
 
         self.divider : str = "     "
@@ -26,13 +29,16 @@ class Tree:
             self.path = newpath
             
         with open(self.path, "w") as file:
+            file.write(self.dir + "\n")
             for line in self.tree:
                 file.write(line + "\n")
     
     def open(self, path : str):
+        self.path = path
         with open(path, "r") as file:
-            for line in file.readlines():
-                self.tree.append("".join(line.split("\n")))
+            self.dir = file.readline().strip("\n")
+            for line in file.readlines()[1:]:
+                self.tree.append(line.strip("\n"))
 
     
     def reset(self) -> None:

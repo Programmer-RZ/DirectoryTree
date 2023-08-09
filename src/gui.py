@@ -181,6 +181,9 @@ class Menubar(Menu):
         filetypes = (("Text files", "*.txt"),)
         path = fd.asksaveasfilename(defaultextension="*.*", filetypes=filetypes)
 
+        if not path:
+            return
+
         selected_tab : Tab = self.tabcontrol.nametowidget(self.tabcontrol.select())
         selected_tab.name = os.path.splitext(os.path.basename(path))[0]
         selected_tab.treeframe.tree.save(path)
@@ -189,9 +192,11 @@ class Menubar(Menu):
     
     def save(self) -> None:
         selected_tab : Tab = self.tabcontrol.nametowidget(self.tabcontrol.select())
-        if not selected_tab.treeframe.tree.path:
+
+        if not selected_tab.treeframe.tree.path or not os.path.isfile(selected_tab.treeframe.tree.path):
             self.save_as()
-        
-        selected_tab.treeframe.tree.save()
+
+        else:
+            selected_tab.treeframe.tree.save()
 
         
