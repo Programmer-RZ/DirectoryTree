@@ -6,9 +6,6 @@ import os
 from ctypes import windll
 windll.shcore.SetProcessDpiAwareness(1)
 
-from treetxt import TextTree
-
-from gui.treeframes import TextTreeFrame
 from gui.tabs import Tab, TextTreeTab
 
 from gui.custom.tabcontrol import CustomNotebook
