@@ -2,9 +2,34 @@ import os
 
 class Tree:
     def __init__(self) -> None:
+        self.walk : iter = None
         
         # path of root directory
         self.dir : str = os.getcwd()
+
+        # path of the file
+        # when directory tree is saved
+        self.path : str = None
+
+    def save(self, newpath : str = None) -> None:
+        pass
+
+    def open(self, path : str) -> None:
+        pass
+
+    def reset(self) -> None:
+        pass
+
+    def create_walk(self) -> None:
+        self.walk = os.walk(self.dir)
+    
+    def create_tree(self) -> None:
+        pass
+
+
+class TextTree(Tree):
+    def __init__(self) -> None:
+        super().__init__()
 
         # parameters
         self.include_folders = True
@@ -13,18 +38,17 @@ class Tree:
 
         self.tree : list = []
         self.depths : list = []
-        self.walk : iter = None
-
-        # path of the file
-        # when directory tree is saved
-        self.path : str = None
 
         self.divider : str = "     "
 
         if not os.path.isdir(self.dir):
             raise NotADirectoryError(self.dir)
     
-    def save(self, newpath : str = None):
+    def reset(self) -> None:
+        self.tree : list = []
+        self.walk : iter = None
+    
+    def save(self, newpath : str = None) -> None:
         if newpath:
             self.path = newpath
             
@@ -33,17 +57,12 @@ class Tree:
             for line in self.tree:
                 file.write(line + "\n")
     
-    def open(self, path : str):
+    def open(self, path : str) -> None:
         self.path = path
         with open(path, "r") as file:
             self.dir = file.readline().strip("\n")
             for line in file.readlines()[1:]:
                 self.tree.append(line.strip("\n"))
-
-    
-    def reset(self) -> None:
-        self.walk = None
-        self.tree = []
     
     def create_walk(self) -> None:
         self.walk = os.walk(self.dir)

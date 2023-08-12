@@ -1,5 +1,5 @@
 
-from gui import Window
+from gui.gui import Window
 
 if __name__ == "__main__":
 
