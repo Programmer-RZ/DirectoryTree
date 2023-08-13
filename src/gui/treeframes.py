@@ -1,5 +1,7 @@
 from tkinter import *
-from treetxt import Tree, TextTree
+from tkinter import ttk
+
+from tree import Tree, TextTree, TreeviewTree
 
 class TreeFrame(Frame):
     def __init__(self, master : Misc, tree : Tree) -> None:
@@ -30,3 +32,14 @@ class TextTreeFrame(TreeFrame):
             self.text.insert(END, line+"\n")
 
         self.text.config(state=DISABLED)
+
+
+class TreeviewTreeFrame(TreeFrame):
+    def __init__(self, master : Misc) -> None:
+        super().__init__(master, None)
+
+        self.treeview = ttk.Treeview(self)
+        
+        self.tree = TreeviewTree(self.treeview)
+
+        self.treeview.grid(row=0, column=0, padx=10, pady=10, sticky="EWNS")

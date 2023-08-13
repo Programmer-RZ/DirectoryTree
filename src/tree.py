@@ -69,7 +69,7 @@ class TextTree(Tree):
     
     def create_tree(self) -> None:
 
-        for folder, subfolders, files in self.walk:
+        for (folder, subfolders, files) in self.walk:
             depth : int = self.get_directory_depth(folder) - self.get_directory_depth(self.dir)
             depth -= 1
             
@@ -120,3 +120,33 @@ class TextTree(Tree):
     def get_basename(self, path : str) -> str:
         # gets the last part of path
         return os.path.basename(path)
+
+
+
+from tkinter import ttk
+
+class TreeviewTree(Tree):
+    def __init__(self, treeview : ttk.Treeview) -> None:
+        super().__init__()
+
+        self.tree : ttk.Treeview = treeview
+    
+    def create_tree(self) -> None:
+        iid = 0 
+
+        for (folder, subfolders, files) in self.walk:
+            folderiid = iid
+            self.tree.insert(parent="", index="end", iid=iid, text=self.get_basename(folder))
+
+            for file in files:
+                iid += 1
+                self.tree.insert(parent="", index="end", iid=iid, text=self.get_basename(file))
+                self.tree.move(str(iid), str(folderiid), str(folderiid-iid-1))
+            
+            iid += 1
+    
+    def get_basename(self, path : str) -> str:
+        # gets the last part of path
+        return os.path.basename(path)
+    
+

@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import filedialog as fd
 
-from gui.treeframes import TreeFrame, TextTreeFrame
+from gui.treeframes import TreeFrame, TextTreeFrame, TreeviewTreeFrame
 
 class Tab(Frame):
     def __init__(self, master : Misc, treeframe : TreeFrame, type : str, name : str = "New") -> None:
@@ -22,7 +22,10 @@ class Tab(Frame):
         self.popup : Toplevel = None
 
     def create_tree_directory(self) -> None:
-        pass
+        self.treeframe.tree.reset()
+        self.treeframe.tree.create_walk()
+        self.treeframe.tree.create_tree()
+        self.treeframe.update()
 
     def create_popup_window(self) -> None:
         pass
@@ -30,20 +33,13 @@ class Tab(Frame):
 class TextTreeTab(Tab):
     def __init__(self, master : Misc, name : str = "New") -> None:
         super().__init__(master, TextTreeFrame, "text_tree", name)
-        
-    
-    def create_tree_directory(self) -> None:
-        self.treeframe.tree.reset()
-        self.treeframe.tree.create_walk()
-        self.treeframe.tree.create_tree()
-        self.treeframe.update()
     
     def create_popup_window(self) -> None:
         if self.popup and self.popup.winfo_exists():
             return
         
         self.popup = Toplevel(self.master)
-        self.popup.title("Create Directory TreeText")
+        self.popup.title("Create Text Directory Tree")
         self.popup.grab_set()
 
         # directory
@@ -92,6 +88,42 @@ class TextTreeTab(Tab):
             else:
                 self.treeframe.tree.include_abspath = False
 
+            self.create_tree_directory()
+            
+            self.popup.destroy()
+            self.popup = None
+
+
+class TreeviewTreeTab(Tab):
+    def __init__(self, master : Misc, name : str = "New") -> None:
+        super().__init__(master, TreeviewTreeFrame, "treeview_tree", name)
+
+    def create_popup_window(self) -> None:
+        if self.popup and self.popup.winfo_exists():
+            return
+        
+        self.popup = Toplevel(self.master)
+        self.popup.title("Create Treeview Directory Tree")
+        self.popup.grab_set()
+
+        # directory
+        current_directory : Label = Label(self.popup, width=40, text=self.treeframe.tree.dir, borderwidth=2, relief="ridge")
+        current_directory.grid(row=0, column=0, padx=10, pady=10)
+
+        pick_directory : Button = Button(self.popup, text="Browse", command=lambda : choose_directory())
+        pick_directory.grid(row=0, column=1, padx=10, pady=10)
+
+        # confirm
+        confirm : Button = Button(self.popup, text="Confirm", command=lambda : confirm())
+        confirm.grid(row=4, column=2, padx=5, pady=10, sticky="ES")
+
+        def choose_directory() -> None:
+            dir : str = fd.askdirectory()
+            if dir:
+                self.treeframe.tree.dir = dir
+                current_directory.config(text=dir)
+        
+        def confirm() -> None:
             self.create_tree_directory()
             
             self.popup.destroy()

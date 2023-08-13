@@ -6,7 +6,7 @@ import os
 from ctypes import windll
 windll.shcore.SetProcessDpiAwareness(1)
 
-from gui.tabs import Tab, TextTreeTab
+from gui.tabs import Tab, TextTreeTab, TreeviewTreeTab
 
 from gui.custom.tabcontrol import CustomNotebook
 
@@ -40,6 +40,7 @@ class Menubar(Menu):
         filemenu : Menu = Menu(self, tearoff=0)
 
         filemenu.add_command(label="New text tree", command=lambda : self.new_texttree_tab())
+        filemenu.add_command(label="New treeview tree", command=lambda : self.new_treeviewtree_tab())
 
         filemenu.add_separator()
 
@@ -57,6 +58,11 @@ class Menubar(Menu):
         self.tabcontrol.add(new, text=new.name)
         self.tabcontrol.select(self.tabcontrol.index("end")-1)
     
+    def new_treeviewtree_tab(self) -> None:
+        new = TreeviewTreeTab(self.master)
+        self.tabcontrol.add(new, text=new.name)
+        self.tabcontrol.select(self.tabcontrol.index("end")-1)
+    
     def open_texttree(self) -> None:
         filetypes = (("Text files", "*.txt"),)
         file = fd.askopenfilename(filetypes=filetypes)
@@ -71,13 +77,16 @@ class Menubar(Menu):
         self.tabcontrol.add(new, text=new.name)
     
     def save_as(self) -> None:
-        filetypes = (("Text files", "*.txt"),)
+        selected_tab : Tab = self.tabcontrol.nametowidget(self.tabcontrol.select())
+
+        if selected_tab.type == "text_tree":
+            filetypes = (("Text files", "*.txt"),)
+
         path = fd.asksaveasfilename(defaultextension="*.*", filetypes=filetypes)
 
         if not path:
             return
 
-        selected_tab : Tab = self.tabcontrol.nametowidget(self.tabcontrol.select())
         selected_tab.name = os.path.splitext(os.path.basename(path))[0]
         selected_tab.treeframe.tree.save(path)
 
