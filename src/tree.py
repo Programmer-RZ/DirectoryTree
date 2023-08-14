@@ -70,7 +70,7 @@ class TextTree(Tree):
     def create_tree(self) -> None:
 
         for (folder, subfolders, files) in self.walk:
-            depth : int = self.get_directory_depth(folder) - self.get_directory_depth(self.dir)
+            depth : int = self.get_path_depth(folder) - self.get_path_depth(self.dir)
             depth -= 1
             
             # folder
@@ -103,7 +103,7 @@ class TextTree(Tree):
         for line in self.tree:
             print(line)
     
-    def get_directory_depth(self, path : str) -> int:
+    def get_path_depth(self, path : str) -> int:
         return path.count(os.path.sep)
 
     def add_root_lines(self, depth : int) -> None:
@@ -131,19 +131,46 @@ class TreeviewTree(Tree):
 
         self.tree : ttk.Treeview = treeview
     
+    def reset(self) -> None:
+        for item in self.tree.get_children():
+            self.tree.delete(item)
+        
+        self.walk : iter = None
+    
     def create_tree(self) -> None:
-        iid = 0 
+        iid : int = 0
+
+        #    previous depth   previous iid
+        folder_depthiid_list = [(0, 0)]
 
         for (folder, subfolders, files) in self.walk:
-            folderiid = iid
-            self.tree.insert(parent="", index="end", iid=iid, text=self.get_basename(folder))
+            depth : int = self.get_path_depth(folder) - self.get_path_depth(self.dir)
+
+            # folderiid = depth merged with the current iid count
+            folderiid : int = int(str(depth)+str(iid))
+            self.tree.insert(parent="", index="end", iid=folderiid, text=self.get_basename(folder))
+
+            # check if folder needs to be moved
+            for (prevdepth, previid) in folder_depthiid_list:
+                if depth-1 == prevdepth:
+                    self.tree.move(str(folderiid), str(previid), -1)
+                    break
+
+            folder_depthiid_list.append((depth, folderiid))
 
             for file in files:
                 iid += 1
-                self.tree.insert(parent="", index="end", iid=iid, text=self.get_basename(file))
-                self.tree.move(str(iid), str(folderiid), str(folderiid-iid-1))
+                
+                # fileiid = depth merged with the current iid count
+                fileiid : int = int(str(depth)+str(iid))
+                self.tree.insert(parent="", index="end", iid=fileiid, text=self.get_basename(file))
+
+                self.tree.move(str(fileiid), str(folderiid), -1)
             
             iid += 1
+    
+    def get_path_depth(self, path : str) -> int:
+        return path.count(os.path.sep)
     
     def get_basename(self, path : str) -> str:
         # gets the last part of path
