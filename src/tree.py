@@ -32,9 +32,9 @@ class TextTree(Tree):
         super().__init__()
 
         # parameters
-        self.include_folders = True
-        self.include_files = True
-        self.include_abspath = False
+        self.include_folders : bool = True
+        self.include_files  : bool = True
+        self.include_abspath : bool = False
 
         self.tree : list = []
         self.depths : list = []
@@ -147,7 +147,7 @@ class TreeviewTree(Tree):
             depth : int = self.get_path_depth(folder) - self.get_path_depth(self.dir)
 
             # folderiid = depth merged with the current iid count
-            folderiid : int = int(str(depth)+str(iid))
+            folderiid : int = iid
             self.tree.insert(parent="", index="end", iid=folderiid, text=self.get_basename(folder))
 
             # check if folder needs to be moved
@@ -162,7 +162,7 @@ class TreeviewTree(Tree):
                 iid += 1
                 
                 # fileiid = depth merged with the current iid count
-                fileiid : int = int(str(depth)+str(iid))
+                fileiid : int = iid
                 self.tree.insert(parent="", index="end", iid=fileiid, text=self.get_basename(file))
 
                 self.tree.move(str(fileiid), str(folderiid), -1)
