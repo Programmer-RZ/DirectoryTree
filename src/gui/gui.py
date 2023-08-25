@@ -50,6 +50,7 @@ class Menubar(Menu):
         filemenu.add_separator()
 
         filemenu.add_command(label="Open text tree", command=lambda : self.open_texttree())
+        filemenu.add_command(label="Open treeview tree", command=lambda : self.open_treeviewtree())
 
         self.add_cascade(label="File", menu=filemenu)
     
@@ -76,11 +77,26 @@ class Menubar(Menu):
         
         self.tabcontrol.add(new, text=new.name)
     
+    def open_treeviewtree(self) -> None:
+        filetypes = (("Pickle files", "*.pkl"),)
+        file = fd.askopenfilename(filetypes=filetypes)
+
+        if not file:
+            return
+        
+        new : TreeviewTreeTab = TreeviewTreeTab(self.master, os.path.splitext(os.path.basename(file))[0])
+        new.treeframe.tree.open(file)
+        new.treeframe.update()
+
+        self.tabcontrol.add(new, text=new.name)
+    
     def save_as(self) -> None:
         selected_tab : Tab = self.tabcontrol.nametowidget(self.tabcontrol.select())
 
         if selected_tab.type == "text_tree":
             filetypes = (("Text files", "*.txt"),)
+        elif selected_tab.type == "treeview_tree":
+            filetypes = (("Pickle files", "*.pkl"),)
 
         path = fd.asksaveasfilename(defaultextension="*.*", filetypes=filetypes)
 

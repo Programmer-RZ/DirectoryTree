@@ -124,20 +124,52 @@ class TextTree(Tree):
 
 
 from tkinter import ttk
+import pickle
 
 class TreeviewTree(Tree):
     def __init__(self, treeview : ttk.Treeview) -> None:
         super().__init__()
 
         self.tree : ttk.Treeview = treeview
-    
+
     def reset(self) -> None:
         for item in self.tree.get_children():
             self.tree.delete(item)
         
         self.walk : iter = None
     
+    def create_walk(self) -> None:
+        # overload the create_walk function
+        # and convert self.walk to a list
+        # so pickle can save it to a file
+
+        self.walk = os.walk(self.dir)
+        self.walk = self.convert_generator_to_list(self.walk)
+    
+    def convert_generator_to_list(self, generator) -> list:
+        iter_object : list = []
+
+        for next in generator:
+            iter_object.append(next)
+
+        return iter_object
+    
+    def open(self, path : str) -> None:
+        self.path = path
+        with open(path, "rb") as file:
+            self.walk = pickle.load(file)
+            self.create_tree()
+
+    
+    def save(self, newpath : str = None) -> None:
+        if newpath:
+            self.path = newpath
+        
+        with open(self.path, "wb") as file:
+            pickle.dump(self.walk, file, pickle.HIGHEST_PROTOCOL)
+    
     def create_tree(self) -> None:
+
         iid : int = 0
 
         #    previous depth   previous iid
